@@ -12,38 +12,39 @@
       font-size: 16px;
     }
     @media (max-width: 600px) {
-      .logo {
-        font-size: 3rem;
-      }
-      .line {
-        font-size: 1.2rem;
-        white-space: normal;
-        text-align: center;
-      }
-      .final-box {
-        font-size: 1.2rem;
-        padding: 1.5rem 1rem;
-      }
-      .final-line {
-        display: block;
-        font-size: 1.4rem;
-        margin-top: 1rem;
-      }
-      .final-price {
-        font-size: 1.8rem;
-      }
-      .buttons {
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        width: 100%;
-      }
-      .btn {
-        width: 90%;
-        max-width: 320px;
-        text-align: center;
-      }
-    }
+  .logo {
+    font-size: 3rem;
+  }
+  .line {
+    font-size: 4.2vw;       /* ← 뷰포트 너비 기준 폰트 크기 */
+    white-space: nowrap;    /* ← 줄바꿈 방지 */
+    text-align: center;
+    overflow: hidden;       /* ← 혹시 넘칠 경우 잘리게 */
+  }
+  .final-box {
+    font-size: 1.2rem;
+    padding: 1.5rem 1rem;
+  }
+  .final-line {
+    display: block;
+    font-size: 1.4rem;
+    margin-top: 1rem;
+  }
+  .final-price {
+    font-size: 1.8rem;
+  }
+  .buttons {
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+  }
+  .btn {
+    width: 90%;
+    max-width: 320px;
+    text-align: center;
+  }
+}
     * {
       margin: 0;
       padding: 0;
