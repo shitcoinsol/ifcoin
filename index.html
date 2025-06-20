@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" type="ico" href="favicon.ico">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$IF — If you had bought...</title>
@@ -24,24 +25,22 @@
         padding: 1.5rem 1rem;
       }
       .final-line {
-      display: block;
-      font-size: 1.4rem;
-      margin-top: 1rem;
-    }
-    .final-price {
+        display: block;
+        font-size: 1.4rem;
+        margin-top: 1rem;
+      }
+      .final-price {
         font-size: 1.8rem;
       }
       .buttons {
-      justify-content: center;
-      align-items: center;
+        justify-content: center;
+        align-items: center;
         flex-direction: column;
         width: 100%;
-        align-items: center;
       }
       .btn {
-      width: 90%;
-      max-width: 320px;
-        width: 80%;
+        width: 90%;
+        max-width: 320px;
         text-align: center;
       }
     }
@@ -150,19 +149,20 @@
   <div class="final-box" id="final-result">
     “Next time I won’t miss it.”<br>
     You said that. Again and again.<br>
-    <span class="final-line">Now 1% IF =</span> <span class="final-price">$3,248.91</span>
-  <div style="font-size: 0.95rem; color: #666; margin-top: 1rem; text-align: center;">
+    <span class="final-line">Now 1% IF =</span> <span class="final-price" id="if-price">$3,248.91</span>
+    <div style="font-size: 0.95rem; color: #666; margin-top: 1rem; text-align: center;">
       This is an example. Real-time price updates coming ~10 min after launch.
     </div>
 
-  <div class="buttons" id="button-group">
-    <a href="https://pump.fun" target="_blank" class="btn">Buy IF</a>
-    <a href="https://t.me/ifcoin" target="_blank" class="btn">Community</a>
+    <div class="buttons" id="button-group">
+      <a href="https://pump.fun" target="_blank" class="btn">Buy IF</a>
+      <a href="https://t.me/ifcoin" target="_blank" class="btn">Community</a>
+    </div>
   </div>
 
   <script>
     const lines = [
-      ["If you had bought ", "1%", " of ", "$USELESS", " at launch, you'd have ", "$98.8K", " now."],
+      ["If you had bought ", "1%", " of ", "$USELESS", " at launch, you'd have ", "$1M", " now."],
       ["If you had bought ", "1%", " of ", "$POPCAT", " at launch, you'd have ", "$2.9M", " now."],
       ["If you had bought ", "1%", " of ", "$WOULD", " at launch, you'd have ", "$5.2M", " now."],
       ["If you had bought ", "1%", " of ", "$WIF", " at launch, you'd have ", "$8.1M", " now."],
@@ -196,6 +196,57 @@
     }
 
     showLines();
+  </script>
+
+  <script>
+    const IF_TOKEN_ADDRESS = ''; // <- 여기에 CA 없으면 $40 표시
+    const FALLBACK_PRICE = '$40';
+    const API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjkyMzBkNGU3LWUyNjEtNGNiYi1hYzgzLTY4MDZmNDg5YzRhOSIsIm9yZ0lkIjoiNDUzNzM2IiwidXNlcklkIjoiNDY2ODMzIiwidHlwZUlkIjoiODVkOTcxZDMtODgzOS00NmYxLWJiMGEtM2IyY2Y5ZmE4NTU2IiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3NDk4MDU3MTcsImV4cCI6NDkwNTU2NTcxN30.nbLVfn0ocROspwVeWXIOtw-d6Gm42Bnshujhlp3JrMI';
+
+    function formatPrice(num) {
+      if (num >= 1e9) return `$${(num / 1e9).toFixed(1)}B`;
+      if (num >= 1e6) return `$${(num / 1e6).toFixed(1)}M`;
+      if (num >= 1e3) return `$${(num / 1e3).toFixed(1)}K`;
+      return `$${num.toFixed(2)}`;
+    }
+
+    async function updateIfPrice() {
+      const priceEl = document.getElementById('if-price');
+      if (!priceEl) return;
+
+      if (!IF_TOKEN_ADDRESS) {
+        priceEl.textContent = FALLBACK_PRICE;
+        return;
+      }
+
+      try {
+        const headers = {
+          accept: 'application/json',
+          'X-API-Key': API_KEY,
+          'content-type': 'application/json'
+        };
+
+        const [metaRes, priceRes] = await Promise.all([
+          fetch(`https://solana-gateway.moralis.io/token/mainnet/${IF_TOKEN_ADDRESS}/metadata`, { headers }).then(res => res.json()),
+          fetch('https://solana-gateway.moralis.io/token/mainnet/prices', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ addresses: [IF_TOKEN_ADDRESS] })
+          }).then(res => res.json())
+        ]);
+
+        const supply = parseFloat(metaRes.totalSupplyFormatted || '1000000000');
+        const usdPrice = priceRes[0]?.usdPrice || 0;
+        const price = supply * usdPrice * 0.01;
+        priceEl.textContent = formatPrice(price);
+      } catch (err) {
+        console.error('IF price fetch failed:', err);
+        priceEl.textContent = FALLBACK_PRICE;
+      }
+    }
+
+    updateIfPrice();
+    setInterval(updateIfPrice, 10000);
   </script>
 </body>
 </html>
